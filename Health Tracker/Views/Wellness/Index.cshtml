@@ -1,0 +1,75 @@
+﻿@model IEnumerable<WellnessEntry>
+
+@{
+
+    ViewData["Title"] = "HealthyMe";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Daily Entry</a>
+</p>
+
+<table class="table table-bordered table-stiped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Water (l)</th>
+            <th>Steps</th>
+            <th>Sleep (hrs)</th>
+            <th>Mood</th>
+            <th>Weight (kg)</th>
+            <th>Height (m)</th>
+            <th>BMI</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>@entry.Date.ToShortDateString()</td>
+                <td>@entry.WaterIntakeInLiters</td>
+                <td>@entry.Steps</td>
+                <td>@entry.SleepHours</td>
+                <td>@entry.Mood</td>
+                <td>@entry.WeightKg</td>
+                <td>@entry.HeightMeters</td>
+                <td>@entry.BMI</td>
+
+                <td>
+    @if (entry.WellnessStatus == "Good")
+    {
+        <span class="badge bg-success">Good</span>
+    }
+    else if (entry.WellnessStatus == "Fair")
+    {
+        <span class="badge bg-warning text-dark">Fair</span>
+    }
+    else
+    {
+        <span class="badge bg-danger">Needs Attention</span>
+    }
+</td>
+
+                <td>
+    <a asp-action="Details" asp-route-id="@entry.Id" class="btn btn-sm btn-info">
+        Details
+    </a>
+
+    <a asp-action="Edit" asp-route-id="@entry.Id" class="btn btn-sm btn-warning ms-1">
+        Edit
+    </a>
+
+    <a asp-action="Delete" asp-route-id="@entry.Id" class="btn btn-sm btn-danger ms-1">
+        Delete
+    </a>
+</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

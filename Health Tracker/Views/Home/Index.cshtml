@@ -1,0 +1,203 @@
+﻿@model Health_Tracker.Models.WellnessEntry
+
+@{
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12
+        ? "Good morning"
+        : hour < 18
+            ? "Good afternoon"
+            : "Good evening";
+}
+
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+
+<div class="bg-light py-5">
+    <div class="container">
+
+        <p class="text-muted fs-5 mb-2">
+            <i class="bi bi-person-circle me-1"></i>
+            @greeting, welcome back
+        </p>
+
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-heart-pulse me-2 text-danger"></i>
+                    Last Wellness Status
+                </h5>
+
+               @if (Model == null)
+{
+    <p class="text-muted mt-3">
+        No wellness entries yet.
+        <a asp-controller="Wellness" asp-action="Create">
+            Start tracking today
+        </a>
+    </p>
+}
+else
+{
+    
+        string badgeClass = "bg-secondary";
+
+        if (Model.WellnessStatus == "Good")
+        {
+            badgeClass = "bg-success";
+        }
+        else if (Model.WellnessStatus == "Fair")
+        {
+            badgeClass = "bg-warning text-dark";
+        }
+        else if (Model.WellnessStatus == "Poor")
+        {
+            badgeClass = "bg-danger";
+        }
+    
+
+    <p class="mb-1">
+        <strong>Status:</strong>
+        <span class="badge @badgeClass">
+            @Model.WellnessStatus
+        </span>
+    </p>
+
+    <p class="mb-1">
+        <strong>Date:</strong>
+        @Model.Date.ToShortDateString()
+    </p>
+
+    <p class="text-muted small">
+        Based on your most recent wellness entry
+    </p>
+
+    <a asp-controller="Wellness" asp-action="Index"
+       class="btn btn-sm btn-outline-primary mt-2">
+        View all entries
+    </a>
+
+    <a asp-controller="Wellness" asp-action="Dashboard"
+       class="btn btn-sm btn-primary mt-2">
+         View Dashboard
+          </a>
+}
+
+                @if (Model != null && Model.BMI > 0)
+                {
+                    <p class="mb-1">
+                        <strong>BMI:</strong>
+                        @Model.BMI
+                        <span class="badge @Model.BMIBadgeClass ms-2">
+                            @Model.BMICategory
+                        </span>
+                    </p>
+
+                    <p class="text-muted small">
+                        Based on your height and weight
+                    </p>
+                }
+
+            </div>
+        </div>
+
+
+
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold">
+                <i class="bi bi-heart-pulse-fill text-success me-2"></i>
+                HealthyMe
+            </h1>
+
+            <p class="lead mt-3">
+                Track your daily wellness, build healthy habits, and understand your body better.
+            </p>
+
+            <div class="mt-4">
+                <a asp-controller="Wellness" asp-action="Create" class="btn btn-success btn-lg me-2">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Today’s Entry
+                </a>
+
+                <a asp-controller="Wellness" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-list-ul me-1"></i>
+                    View Wellness History
+                </a>
+            </div>
+        </div>
+
+
+    <!-- Features Section -->
+    <div class="row text-center">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-journal-text text-primary me-2"></i>
+                            Daily Tracking
+                        </h5>
+
+                    <p class="card-text">
+                        Log your mood, sleep, hydration, steps, and body metrics.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-activity text-success me-2"></i>
+                            Wellness Status
+                        </h5>
+
+                    <p class="card-text">
+                        Get a simple wellness summary based on your daily habits.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-speedometer2 text-warning me-2"></i>
+                            BMI Insight
+                        </h5>
+
+                    <p class="card-text">
+                        Automatically calculate and understand your BMI.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-calendar-check text-info me-2"></i>
+                            Progress Over Time
+                        </h5>
+
+                    <p class="card-text">
+                        Review past entries and spot wellness trends.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motivation -->
+    <div class="text-center mt-5">
+        <p class="fst-italic text-muted">
+            “Wellness is built one day at a time.”
+        </p>
+    </div>
+
+</div>

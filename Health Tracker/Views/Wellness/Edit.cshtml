@@ -1,0 +1,81 @@
+﻿@model Health_Tracker.Models.WellnessEntry
+
+@{
+    ViewData["Title"] = "Edit WellnessEntry";
+}
+
+<h2 class="mb-4">Edit Wellness Entry</h2>
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger" mb-3></div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+           <label asp-for="Date" class="form-label"></label>
+           <input asp-for="Date" class="form-control" />
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Mood" class="form-label"></label>
+            <select asp-for="Mood" class="form-select">
+            <option>Great</option>
+            <option>Good</option>
+            <option>Okay</option>
+            <option>Low</option>
+            <option>Stressed</option>
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="SleepHours" class="form-label"></label>
+            <input asp-for="SleepHours" class="form-control" />
+        </div
+
+     </div>
+
+     <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="WaterIntakeInLiters" class="form-label"></label>
+            <input asp-for="WaterIntakeInLiters" class="form-control" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Steps" class="form-label"></label>
+            <input asp-for="Steps" class="form-control" />
+        </div>
+    </div>
+
+    <hr />
+    <h5>Body Metrics</h5>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="WeightKg" class="form-label"></label>
+            <input asp-for="WeightKg" class="form-control" />
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="HeightMeters" class="form-label"></label>
+            <input asp-for="HeightMeters" class="form-control" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Update Entry
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">
+        Cancel
+    </a>
+
+        
+    
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,35 @@
+﻿@model Health_Tracker.Models.WellnessEntry
+
+@{
+    ViewData["Title"] = "Delete Entry";
+}
+
+<h2 class="text-danger">Delete Confirmation</h2>
+
+<div class="alert alert-warning mt-3">
+    <a href="c:\users\user\source\repos\health tracker\health tracker\views\wellness\delete.cshtml">c:\users\user\source\repos\health tracker\health tracker\views\wellness\delete.cshtml</a>
+    Are you sure you want to delete this wellness entry?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Date</dt>
+    <dd class="col-sm-9">@Model.Date.ToShortDateString()</dd>
+
+    <dt class="col-sm-3">Mood</dt>
+    <dd class="col-sm-9">@Model.Mood</dd>
+
+    <dt class="col-sm-3">Sleep</dt>
+    <dd class="col-sm-9">@Model.SleepHours hrs</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">
+        Delete
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">
+        Cancel
+    </a>
+</form>

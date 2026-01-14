@@ -1,0 +1,108 @@
+﻿@model Health_Tracker.Models.WellnessEntry
+
+@{
+    ViewData["Title"] = "Wellness Details";
+}
+
+<h2 class="mb-4">Daily Wellness Summary</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row">
+
+            <dt class="col-sm-4">Date</dt>
+            <dd class="col-sm-8">@Model.Date.ToShortDateString()</dd>
+
+            <dt class="col-sm-4">Mood</dt>
+            <dd class="col-sm-8">@Model.Mood</dd>
+
+            <dt class="col-sm-4">Sleep</dt>
+            <dd class="col-sm-8">@Model.SleepHours hrs</dd>
+
+            <dt class="col-sm-4">Water Intake</dt>
+            <dd class="col-sm-8">@Model.WaterIntakeInLiters L</dd>
+
+            <dt class="col-sm-4">Steps</dt>
+            <dd class="col-sm-8">@Model.Steps</dd>
+
+            <hr />
+
+            <dt class="col-sm-4">Weight</dt>
+            <dd class="col-sm-8">@Model.WeightKg kg</dd>
+
+            <dt class="col-sm-4">Height</dt>
+            <dd class="col-sm-8">@Model.HeightMeters m</dd>
+
+            <dt class="col-sm-4">BMI</dt>
+            <dd class="col-sm-8">
+                @Model.BMI.ToString("0.0")
+            </dd>
+
+            <dt class="col-sm-4">BMI Category</dt>
+            <dd class="col-sm-8">
+                <span class="badge bg-info">
+                    @Model.BMICategory
+                </span>
+            </dd>
+            @{
+                string bmiAlertClass = Model.BMICategory switch
+                {
+                    "Normal" => "alert-success",
+                    "Underweight" => "alert-warning",
+                    "Overweight" => "alert-warning",
+                    "Obese" => "alert-danger",
+                    _ => "alert-secondary"
+                };
+            }
+
+
+            <dt class="col-sm-4">BMI Feedback</dt>
+            <dd class="col-sm-8">
+                <div class="alert @bmiAlertClass mb-0">
+                    @Model.BMIFeedback
+                </div>
+            </dd>
+
+            <hr />
+
+            <h5 class="mt-3">
+                <i class="bi bi-lightbulb me-2 text-primary"></i>
+                Health Insight
+            </h5>
+
+            <div class="alert alert-info">
+                @Model.HealthInsight
+            </div>
+
+
+
+            <dt class="col-sm-4">Wellness Status</dt>
+            <dd class="col-sm-8">
+                @if (Model.WellnessStatus == "Good")
+                {
+                    <span class="badge bg-success">Good</span>
+                }
+                else if (Model.WellnessStatus == "Fair")
+                {
+                    <span class="badge bg-warning text-dark">Fair</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Needs Attention</span>
+                }
+            </dd>
+
+
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+        Edit
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">
+        Back to List
+    </a>
+</div>

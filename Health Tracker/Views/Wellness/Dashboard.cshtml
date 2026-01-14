@@ -1,0 +1,122 @@
+﻿@model List<Health_Tracker.Models.WellnessEntry>
+
+@{
+    ViewData["Title"] = "Wellness Dashboard";
+}
+
+<h2 class="mb-4">Wellness Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>BMI Over Time</h5>
+                <canvas id="bmiChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Steps Over Time</h5>
+                <canvas id="stepsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Water Intake Over Time</h5>
+                <canvas id="waterChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Sleep Hours Over Time</h5>
+                <canvas id="sleepChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dates = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(e => e.Date.ToString("MM/dd"))));
+        const bmiData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(e => e.BMI)));
+        const stepsData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(e => e.Steps)));
+        const waterData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(e => e.WaterIntakeInLiters)));
+        const sleepData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(e => e.SleepHours)));
+
+        // BMI Chart
+        new Chart(document.getElementById('bmiChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'BMI',
+                    data: bmiData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Steps Chart
+        new Chart(document.getElementById('stepsChart'), {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Steps',
+                    data: stepsData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Water Intake Chart
+        new Chart(document.getElementById('waterChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Water Intake (L)',
+                    data: waterData,
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Sleep Hours Chart
+        new Chart(document.getElementById('sleepChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Sleep Hours',
+                    data: sleepData,
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+    </script>
+}
