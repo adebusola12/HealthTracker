@@ -1,77 +1,179 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Health_Tracker.Models
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthyMe</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Health_Tracker.styles.css" asp-append-version="true" />
 </head>
+
 <body class="d-flex flex-column min-vh-100">
 
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HealthyMe</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm">
+            <div class="container">
+
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    HealthyMe
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Wellness" asp-action="Create">Wellness</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Wellness" asp-action="Dashboard">Dashboard</a>
 
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    <!-- Left Menu -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Wellness" asp-action="Create">Wellness</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Wellness" asp-action="Dashboard">Dashboard</a>
                         </li>
                     </ul>
-                    @if (User.Identity?.IsAuthenticated ?? false)
-                    {
-                        <li class="nav-item">
-                            <span class="navbar-text me-3">Hello, @User.Identity.Name!</span>
-                        </li>
-                        <li class="nav-item">
-                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-link nav-link text-dark">Logout</button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
-                    }
+
+                    <!-- Right Side -->
+                    <ul class="navbar-nav ms-auto">
+
+                        @{
+                            var currentUser = User.Identity?.IsAuthenticated == true
+                            ? await UserManager.GetUserAsync(User)
+                            : null;
+                        }
+
+                        @if (currentUser != null)
+                        {
+                            <!-- Profile + Greeting -->
+                            <li class="nav-item d-flex align-items-center me-3">
+
+                                @if (!string.IsNullOrEmpty(currentUser.ProfilePhotoPath))
+                                {
+                                    <img src="@currentUser.ProfilePhotoPath"
+                                         width="35"
+                                         height="35"
+                                         class="rounded-circle me-2"
+                                         style="object-fit:cover;" />
+                                }
+
+                                <span class="navbar-text">
+                                    Hello, <strong>@currentUser.FirstName</strong>
+                                </span>
+                            </li>
+
+                            <!-- Profile Link -->
+                            <li class="nav-item">
+                                <a asp-controller="Home"
+                                   asp-action="Profile"
+                                   class="nav-link">
+                                    My Profile
+                                </a>
+                            </li>
+
+                            <!-- Logout -->
+                            <li class="nav-item">
+                                <form asp-area="Identity"
+                                      asp-page="/Account/Logout"
+                                      method="post"
+                                      class="d-inline">
+                                    <button type="submit"
+                                            class="btn btn-link nav-link">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Register -->
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-area="Identity"
+                                   asp-page="/Account/Register">
+                                    Register
+                                </a>
+                            </li>
+
+                            <!-- Login -->
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-area="Identity"
+                                   asp-page="/Account/Login">
+                                    Login
+                                </a>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <main class="flex-fill container">
+
+    <main class="flex-fill container mt-4">
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - HealthyMe - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-auto bg-light">
+        <div class="container py-4">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <h6>HealthyMe</h6>
+                    <p class="small">
+                        Track your wellness journey, monitor habits, and gain meaningful health insights.
+                    </p>
+                </div>
+
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled small">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="Wellness" asp-action="Dashboard">Dashboard</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3">
+                    <h6>Account</h6>
+                    <ul class="list-unstyled small">
+                        <li><a asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+                        <li><a asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div class="text-center small">
+                &copy; @DateTime.Now.Year HealthyMe. All rights reserved.
+            </div>
         </div>
     </footer>
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

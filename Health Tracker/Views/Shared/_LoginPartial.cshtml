@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Health_Tracker.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav ms-auto">
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+
+        <li class="nav-item d-flex align-items-center">
+
+            @* Profile Image *@
+            @if (!string.IsNullOrEmpty(user?.ProfilePhotoPath))
+            {
+                <img src="@user.ProfilePhotoPath"
+                     width="35"
+                     height="35"
+                     class="rounded-circle me-2"
+                     style="object-fit: cover;" />
+            }
+
+            @* Greeting *@
+            <span class="nav-link text-dark">
+                Hello, @user?.FirstName
+            </span>
+
+            @* Profile Link *@
+            <a class="nav-link text-dark"
+               asp-controller="Home"
+               asp-action="Profile">
+                My Profile
+            </a>
+
+            @* Logout *@
+            <form class="form-inline"
+                  asp-area="Identity"
+                  asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                  method="post">
+
+                <button type="submit" class="nav-link btn btn-link text-dark border-0">
+                    Logout
+                </button>
+            </form>
+
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark"
+               asp-area="Identity"
+               asp-page="/Account/Register">
+                Register
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-dark"
+               asp-area="Identity"
+               asp-page="/Account/Login">
+                Login
+            </a>
+        </li>
+    }
+
+</ul>

@@ -1,0 +1,51 @@
+﻿@model Health_Tracker.Models.ApplicationUser
+
+<h2 class="mb-4">My Profile</h2>
+
+<div class="card shadow-sm p-4">
+
+    <!-- Profile Photo -->
+    @if (!string.IsNullOrEmpty(Model.ProfilePhotoPath))
+    {
+        <img src="@Model.ProfilePhotoPath"
+             width="160"
+             class="rounded-circle mb-3 border" />
+    }
+    else
+    {
+        <p class="text-muted">No profile photo uploaded yet.</p>
+    }
+
+    @if (TempData["UploadError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["UploadError"]
+        </div>
+    }
+
+    <!-- Upload Form -->
+    <form asp-controller="Home"
+          asp-action="UploadPhoto"
+          method="post"
+          enctype="multipart/form-data">
+
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <input type="file"
+                   name="photo"
+                   class="form-control"
+                   accept="image/*"
+                   required />
+        </div>
+
+    </form>
+
+    <hr />
+
+    <!-- Profile Details -->
+    <p><strong>First Name:</strong> @Model.FirstName</p>
+    <p><strong>Last Name:</strong> @Model.LastName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+
+</div>

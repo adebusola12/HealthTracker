@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Health_Tracker.Data;
+﻿using Health_Tracker.Data;
 using Health_Tracker.Models;
-using SQLitePCL;
+using Health_Tracker.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 using System.Security.Claims;
 
 namespace Health_Tracker.Controllers
@@ -177,14 +178,42 @@ namespace Health_Tracker.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Only get entries for the logged-in user
             var entries = await _context.WellnessEntries
                 .Where(e => e.UserId == userId)
                 .OrderBy(e => e.Date)
-                .Take(30)
                 .ToListAsync();
 
-            return View(entries);
+            var moodGroups = entries
+                .GroupBy(e => e.Mood)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            int wellnessScore = 0;
+
+            if (entries.Any())
+            {
+                wellnessScore =
+                    (entries.Average(e => e.SleepHours) >= 7 ? 20 : 0) +
+                    (entries.Average(e => e.Steps) >= 7000 ? 20 : 0) +
+                    (entries.Average(e => e.WaterIntakeInLiters) >= 2 ? 20 : 0) +
+                    (entries.Average(e => e.BMI) >= 18.5 && entries.Average(e => e.BMI) <= 24.9 ? 20 : 0) +
+                    (entries.Count(e => e.Mood == "Great" || e.Mood == "Good") > entries.Count / 2 ? 20 : 0);
+            }
+
+            var model = new DashboardViewModel
+            {
+                Entries = entries,
+                TotalEntries = entries.Count,
+                AvgSleep = entries.Any() ? entries.Average(e => e.SleepHours) : 0,
+                AvgSteps = entries.Any() ? entries.Average(e => e.Steps) : 0,
+                AvgWater = entries.Any() ? entries.Average(e => e.WaterIntakeInLiters) : 0,
+                AvgBMI = entries.Any() ? entries.Average(e => e.BMI) : 0,
+                WellnessScore = wellnessScore,
+                MoodDistribution = moodGroups
+            };
+
+            return View(model);
         }
+
+
     }
 }
