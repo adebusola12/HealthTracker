@@ -4,7 +4,6 @@ using Health_Tracker.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 using System.Security.Claims;
 
 namespace Health_Tracker.Controllers
