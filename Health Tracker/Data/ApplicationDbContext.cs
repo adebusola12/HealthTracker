@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Health_Tracker.Models;
+﻿using Health_Tracker.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
-namespace Health_Tracker.Data
+public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options) :base(options)
-        {
-            
-        }
-
-        public DbSet<WellnessEntry> WellnessEntries { get; set; }
     }
+
+    public DbSet<WellnessEntry> WellnessEntries { get; set; }
 }
