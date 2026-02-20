@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // SERVICES
 // --------------------
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("HealthTrackerDb")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("HealthTrackerDb")));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
