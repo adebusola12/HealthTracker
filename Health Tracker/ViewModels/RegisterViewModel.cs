@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Health_Tracker.ViewModels
+namespace HealthTracker.ViewModels
 {
     public class RegisterViewModel
     {

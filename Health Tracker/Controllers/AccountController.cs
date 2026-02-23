@@ -1,5 +1,5 @@
-﻿using Health_Tracker.Models;
-using Health_Tracker.ViewModels;
+﻿using HealthTracker.Models;
+using HealthTracker.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Health_Tracker.Data;
-using Health_Tracker.Models;
+using HealthTracker.Data;
+using HealthTracker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

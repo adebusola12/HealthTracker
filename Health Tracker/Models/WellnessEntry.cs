@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace Health_Tracker.Models
+namespace HealthTracker.Models
 {
     public class WellnessEntry
     {

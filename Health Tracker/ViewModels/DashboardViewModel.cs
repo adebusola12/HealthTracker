@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Health_Tracker.Models;
+using HealthTracker.Models;
 
-namespace Health_Tracker.Models.ViewModels
+namespace HealthTracker.Models.ViewModels
 {
     public class DashboardViewModel
     {

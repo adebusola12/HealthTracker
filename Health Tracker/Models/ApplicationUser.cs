@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Health_Tracker.Models
+namespace HealthTracker.Models
 {
     public class ApplicationUser : IdentityUser
     {

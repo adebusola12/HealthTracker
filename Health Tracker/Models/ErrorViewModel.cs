@@ -1,4 +1,4 @@
-namespace Health_Tracker.Models
+namespace HealthTracker.Models
 {
     public class ErrorViewModel
     {

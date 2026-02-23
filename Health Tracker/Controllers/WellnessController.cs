@@ -1,6 +1,6 @@
-﻿using Health_Tracker.Data;
-using Health_Tracker.Models;
-using Health_Tracker.Models.ViewModels;
+﻿using HealthTracker.Data;
+using HealthTracker.Models;
+using HealthTracker.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

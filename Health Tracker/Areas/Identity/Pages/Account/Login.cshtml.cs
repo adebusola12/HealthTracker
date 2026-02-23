@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Health_Tracker.Models;
+using HealthTracker.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Health_Tracker.Areas.Identity.Pages.Account
+namespace HealthTracker.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
@@ -31,6 +31,7 @@ namespace Health_Tracker.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
+            [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
         }
 
@@ -52,9 +53,7 @@ namespace Health_Tracker.Areas.Identity.Pages.Account
                     lockoutOnFailure: true);
 
                 if (result.Succeeded)
-                {
                     return LocalRedirect(returnUrl);
-                }
 
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
