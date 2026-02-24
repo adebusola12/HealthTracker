@@ -44,13 +44,17 @@ namespace Health_Tracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Set the UserId to the current logged-in user
+                // Set the UserId
                 entry.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+                entry.Date = DateTime.SpecifyKind(entry.Date, DateTimeKind.Utc);
 
                 _context.Add(entry);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(entry);
         }
 
@@ -98,7 +102,7 @@ namespace Health_Tracker.Controllers
                 try
                 {
                     // Update fields but keep the original UserId
-                    existingEntry.Date = entry.Date;
+                    existingEntry.Date = DateTime.SpecifyKind(entry.Date, DateTimeKind.Utc);
                     existingEntry.Mood = entry.Mood;
                     existingEntry.SleepHours = entry.SleepHours;
                     existingEntry.WaterIntakeInLiters = entry.WaterIntakeInLiters;
