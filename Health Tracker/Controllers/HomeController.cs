@@ -79,6 +79,7 @@ namespace Health_Tracker.Controllers
             user.ProfilePhotoPath = "/uploads/" + fileName;
             await _userManager.UpdateAsync(user);
 
+            TempData["UploadSuccess"] = "Profile photo uploaded successfully!";
             return RedirectToAction("Profile");
         }
 
