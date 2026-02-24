@@ -88,10 +88,11 @@
 
                             <!-- Logout -->
                             <li class="nav-item">
-                                <form asp-area="Identity"
-                                      asp-page="/Account/Logout"
-                                      method="post"
-                                      class="d-inline">
+                                <form asp-controller="Account"
+                                  asp-action="Logout"
+                                   method="post"
+                                    class="d-inline">
+                                    @Html.AntiForgeryToken()
                                     <button type="submit"
                                             class="btn btn-link nav-link">
                                         Logout
