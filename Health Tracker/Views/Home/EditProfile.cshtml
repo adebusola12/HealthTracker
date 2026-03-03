@@ -1,0 +1,21 @@
+﻿@model HealthTracker.Models.ApplicationUser
+
+<h2>Edit Profile</h2>
+
+<form asp-action="EditProfile" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label>First Name</label>
+        <input asp-for="FirstName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Last Name</label>
+        <input asp-for="LastName" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Save Changes
+    </button>
+</form>

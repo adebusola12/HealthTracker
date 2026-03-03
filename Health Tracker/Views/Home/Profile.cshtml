@@ -74,4 +74,23 @@
         <p><strong>Email:</strong> @Model.Email</p>
     </div>
 
+    <a asp-controller="Home"
+       asp-action="EditProfile"
+       class="btn btn-outline-secondary btn-sm me-2">
+        Edit Profile
+    </a>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <a asp-controller="Home"
+       asp-action="ChangePassword"
+       class="btn btn-outline-dark btn-sm">
+        Change Password
+    </a>
+
 </div>

@@ -1,10 +1,13 @@
-using System.Diagnostics;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using HealthTracker.Data;
 using HealthTracker.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using HealthTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace Health_Tracker.Controllers
@@ -14,14 +17,26 @@ namespace Health_Tracker.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _env;
-        
+        private readonly Cloudinary _cloudinary;
 
-        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
+
+        public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInmanager,
+            IWebHostEnvironment env, IConfiguration config)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInmanager;
             _env = env;
+
+            var account = new Account(
+        config["Cloudinary:CloudName"],
+        config["Cloudinary:ApiKey"],
+        config["Cloudinary:ApiSecret"]
+           );
+
+            _cloudinary = new Cloudinary(account);
         }
 
         public async Task<IActionResult> Index()
@@ -63,24 +78,97 @@ namespace Health_Tracker.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(photo.FileName);
-            var uploadPath = Path.Combine(_env.WebRootPath, "uploads");
+            using var stream = photo.OpenReadStream();
 
-            if (!Directory.Exists(uploadPath))
-                Directory.CreateDirectory(uploadPath);
-
-            var fullPath = Path.Combine(uploadPath, fileName);
-
-            using (var stream = new FileStream(fullPath, FileMode.Create))
+            var uploadParams = new ImageUploadParams
             {
-                await photo.CopyToAsync(stream);
+                File = new FileDescription(photo.FileName, stream),
+                Transformation = new Transformation()
+                    .Width(300)
+                    .Height(300)
+                    .Crop("fill")
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
+            {
+                TempData["UploadError"] = uploadResult.Error.Message;
+                return RedirectToAction("Profile");
             }
 
-            user.ProfilePhotoPath = "/uploads/" + fileName;
+            user.ProfilePhotoPath = uploadResult.SecureUrl.ToString();
             await _userManager.UpdateAsync(user);
 
-            TempData["UploadSuccess"] = "Profile photo uploaded successfully!";
             return RedirectToAction("Profile");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return NotFound();
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(ApplicationUser model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return NotFound();
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+
+            await _userManager.UpdateAsync(user);
+
+            TempData["Success"] = "Profile updated successfully.";
+
+            return RedirectToAction("Profile");
+        }
+
+        public IActionResult ChangePassword()
+        {
+                       return View();
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return NotFound();
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                model.CurrentPassword,
+                model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                TempData["Success"] = "Password changed successfully.";
+                return RedirectToAction("Profile");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
         }
 
         public IActionResult Privacy()
