@@ -26,7 +26,7 @@ namespace HealthTracker.Services
 
             var from = new EmailAddress(fromEmail, fromName);
             var to = new EmailAddress(toEmail);
-
+            
             var msg = MailHelper.CreateSingleEmail(from, to, subject, message, message);
 
             var response = await client.SendEmailAsync(msg);
