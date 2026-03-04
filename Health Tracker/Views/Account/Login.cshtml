@@ -3,8 +3,22 @@
     ViewData["Title"] = "Login";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <div class="row">
     <div class="col-md-6 offset-md-3">
+
+        <div class="card shadow p-4">
+
+            <div class="text-center mb-4">
+                <img src="/images/HealthyMe.png" alt="HealthyMe Logo" width="90">
+            </div>
+
         <h2>Login</h2>
 
         <form asp-action="Login" method="post">

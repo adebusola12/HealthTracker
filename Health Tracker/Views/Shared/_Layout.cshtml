@@ -15,7 +15,9 @@
     <link rel="stylesheet" href="~/Health_Tracker.styles.css" asp-append-version="true" />
 </head>
 
-<div id="loadingSpinner" style="
+
+<body class="d-flex flex-column min-vh-100">
+    <div id="loadingSpinner" style="
 position: fixed;
 top:0;
 left:0;
@@ -27,19 +29,11 @@ align-items:center;
 justify-content:center;
 z-index:9999;">
 
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
     </div>
-
-</div>
-
-<script>
-    window.addEventListener("load", function () {
-        document.getElementById("loadingSpinner").style.display = "none";
-    });
-</script>
-
-<body class="d-flex flex-column min-vh-100">
 
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm">
@@ -130,8 +124,8 @@ z-index:9999;">
                             <!-- Register -->
                             <li class="nav-item">
                                 <a class="nav-link"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Register">
+                                   asp-controller="Account"
+                                   asp-action="Register">
                                     Register
                                 </a>
                             </li>
@@ -139,8 +133,8 @@ z-index:9999;">
                             <!-- Login -->
                             <li class="nav-item">
                                 <a class="nav-link"
-                                   asp-area="Identity"
-                                   asp-page="/Account/Login">
+                                   asp-controller="Account"
+                                   asp-action="Login">
                                     Login
                                 </a>
                             </li>
@@ -201,5 +195,10 @@ z-index:9999;">
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        window.addEventListener("load", function () {
+            document.getElementById("loadingSpinner").style.display = "none";
+        });
+    </script>
 </body>
 </html>
