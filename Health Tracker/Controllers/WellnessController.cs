@@ -33,10 +33,16 @@ namespace Health_Tracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            return View();
+            var entry = new WellnessEntry
+            {
+                Date = DateTime.Today
+            };
+
+            return View(entry);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
@@ -194,11 +200,11 @@ namespace Health_Tracker.Controllers
                 .OrderBy(e => e.Date)
                 .ToListAsync();
 
-            // Wellness streak logic
+            // ================= STREAK LOGIC =================
             int streak = 0;
             DateTime checkDate = DateTime.Today;
 
-            foreach (var entry in entries)
+            foreach (var entry in entries.OrderByDescending(e => e.Date))
             {
                 if (entry.Date.Date == checkDate)
                 {
@@ -213,12 +219,12 @@ namespace Health_Tracker.Controllers
 
             ViewBag.Streak = streak;
 
-            return View(entries);
-
+            // ================= MOOD DISTRIBUTION =================
             var moodGroups = entries
                 .GroupBy(e => e.Mood)
                 .ToDictionary(g => g.Key, g => g.Count());
 
+            // ================= WELLNESS SCORE =================
             int wellnessScore = 0;
 
             if (entries.Any())
@@ -231,6 +237,7 @@ namespace Health_Tracker.Controllers
                     (entries.Count(e => e.Mood == "Great" || e.Mood == "Good") > entries.Count / 2 ? 20 : 0);
             }
 
+            // ================= BUILD VIEWMODEL =================
             var model = new DashboardViewModel
             {
                 Entries = entries,
@@ -245,7 +252,6 @@ namespace Health_Tracker.Controllers
 
             return View(model);
         }
-
 
     }
 }
