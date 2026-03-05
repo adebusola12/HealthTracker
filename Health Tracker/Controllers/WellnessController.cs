@@ -37,34 +37,33 @@ namespace Health_Tracker.Controllers
         {
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Check if entry already exists for that date
+            if (!ModelState.IsValid)
+                return View(entry);
+
+            if (entry.Date == default)
+                entry.Date = DateTime.Today;
+
             var existingEntry = await _context.WellnessEntries
                 .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
 
             if (existingEntry != null)
             {
-                TempData["Error"] = "You already have a wellness entry for this date.";
-                return RedirectToAction("Dashboard");
+                TempData["Error"] = "You already logged wellness data for this date.";
+                return RedirectToAction("Create");
             }
 
-            if (ModelState.IsValid)
-            {
-                entry.UserId = userId;
+            entry.UserId = userId;
 
-                _context.Add(entry);
-                await _context.SaveChangesAsync();
+            _context.WellnessEntries.Add(entry);
+            await _context.SaveChangesAsync();
 
-                return RedirectToAction("Dashboard");
-            }
-
-            return View(entry);
+            return RedirectToAction("Dashboard");
         }
 
         public async Task<IActionResult> Edit(int? id)
@@ -194,6 +193,27 @@ namespace Health_Tracker.Controllers
                 .Where(e => e.UserId == userId)
                 .OrderBy(e => e.Date)
                 .ToListAsync();
+
+            // Wellness streak logic
+            int streak = 0;
+            DateTime checkDate = DateTime.Today;
+
+            foreach (var entry in entries)
+            {
+                if (entry.Date.Date == checkDate)
+                {
+                    streak++;
+                    checkDate = checkDate.AddDays(-1);
+                }
+                else if (entry.Date.Date < checkDate)
+                {
+                    break;
+                }
+            }
+
+            ViewBag.Streak = streak;
+
+            return View(entries);
 
             var moodGroups = entries
                 .GroupBy(e => e.Mood)
