@@ -42,17 +42,26 @@ namespace Health_Tracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Check if entry already exists for that date
+            var existingEntry = await _context.WellnessEntries
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
+
+            if (existingEntry != null)
+            {
+                TempData["Error"] = "You already have a wellness entry for this date.";
+                return RedirectToAction("Dashboard");
+            }
+
             if (ModelState.IsValid)
             {
-                // Set the UserId
-                entry.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-                entry.Date = DateTime.SpecifyKind(entry.Date, DateTimeKind.Utc);
+                entry.UserId = userId;
 
                 _context.Add(entry);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Dashboard");
             }
 
             return View(entry);

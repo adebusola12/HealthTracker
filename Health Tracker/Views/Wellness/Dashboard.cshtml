@@ -6,6 +6,19 @@
     ViewData["Title"] = "Wellness Dashboard";
 }
 
+@if (ViewBag.Streak > 0)
+{
+    <div class="alert alert-success text-center">
+        🔥 You're on a <strong>@ViewBag.Streak day streak!</strong> Keep it going!
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        Start your wellness streak today 💪
+    </div>
+}
+
 <h2 class="mb-4">Wellness Dashboard</h2>
 
 @if (!Model.Entries.Any())
