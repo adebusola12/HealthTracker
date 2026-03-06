@@ -1,10 +1,21 @@
 ﻿using HealthTracker.Data;
 using HealthTracker.Models;
 using HealthTracker.Models.ViewModels;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Newtonsoft.Json.Linq;
+using System.Data;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Reflection;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Health_Tracker.Controllers
 {
@@ -47,30 +58,37 @@ namespace Health_Tracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!ModelState.IsValid)
-                return View(entry);
-
-            if (entry.Date == default)
-                entry.Date = DateTime.Today;
-
-            var existingEntry = await _context.WellnessEntries
-                .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
-
-            if (existingEntry != null)
+            try
             {
-                TempData["Error"] = "You already logged wellness data for this date.";
-                return RedirectToAction("Create");
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var existingEntry = await _context.WellnessEntries
+                    .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
+
+                if (existingEntry != null)
+                {
+                    TempData["Error"] = "You already have a wellness entry for this date.";
+                    return RedirectToAction("Dashboard");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    entry.UserId = userId;
+
+                    _context.Add(entry);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Dashboard");
+                }
+
+                return View(entry);
             }
-
-            entry.UserId = userId;
-
-            _context.WellnessEntries.Add(entry);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Dashboard");
+            catch (Exception ex)
+            {
+                return Content("ERROR: " + ex.Message);
+            }
         }
+
 
         public async Task<IActionResult> Edit(int? id)
         {
