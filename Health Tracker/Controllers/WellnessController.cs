@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
@@ -53,16 +54,25 @@ namespace Health_Tracker.Controllers
 
             return View(entry);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Normalize date
             entry.Date = entry.Date.Date;
 
+            // Prevent future dates
+            if (entry.Date > DateTime.Today)
+            {
+                ModelState.AddModelError("Date", "You cannot add entries for future dates.");
+                return View(entry);
+            }
+
             var existingEntry = await _context.WellnessEntries
-                .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.Date == entry.Date);
 
             if (existingEntry != null)
             {
@@ -83,7 +93,6 @@ namespace Health_Tracker.Controllers
 
             return View(entry);
         }
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -214,18 +223,27 @@ namespace Health_Tracker.Controllers
 
             // ================= STREAK LOGIC =================
             int streak = 0;
-            DateTime checkDate = DateTime.Today;
 
-            foreach (var entry in entries.OrderByDescending(e => e.Date))
+            var entryDates = entries
+                .Select(e => e.Date.Date)
+                .OrderByDescending(d => d)
+                .ToList();
+
+            if (entryDates.Any())
             {
-                if (entry.Date.Date == checkDate)
+                DateTime checkDate = entryDates.First();
+
+                foreach (var date in entryDates)
                 {
-                    streak++;
-                    checkDate = checkDate.AddDays(-1);
-                }
-                else if (entry.Date.Date < checkDate)
-                {
-                    break;
+                    if (date == checkDate)
+                    {
+                        streak++;
+                        checkDate = checkDate.AddDays(-1);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 
