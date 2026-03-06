@@ -53,42 +53,37 @@ namespace Health_Tracker.Controllers
 
             return View(entry);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WellnessEntry entry)
         {
-            try
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // FIX: ensure PostgreSQL receives UTC
+            entry.Date = DateTime.SpecifyKind(entry.Date.Date, DateTimeKind.Utc);
+
+            var existingEntry = await _context.WellnessEntries
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
+
+            if (existingEntry != null)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                var existingEntry = await _context.WellnessEntries
-                    .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
-
-                if (existingEntry != null)
-                {
-                    TempData["Error"] = "You already have a wellness entry for this date.";
-                    return RedirectToAction("Dashboard");
-                }
-
-                if (ModelState.IsValid)
-                {
-                    entry.UserId = userId;
-
-                    _context.Add(entry);
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction("Dashboard");
-                }
-
-                return View(entry);
+                TempData["Error"] = "You already have a wellness entry for this date.";
+                return RedirectToAction("Index");
             }
-            catch (Exception ex)
+
+            if (ModelState.IsValid)
             {
-                return Content("ERROR: " + ex.Message);
+                entry.UserId = userId;
+
+                _context.Add(entry);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Entry saved successfully!";
+                return RedirectToAction("Index");
             }
+
+            return View(entry);
         }
-
 
         public async Task<IActionResult> Edit(int? id)
         {

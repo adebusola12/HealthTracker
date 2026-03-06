@@ -12,6 +12,7 @@ namespace HealthTracker.Models
 
         [Required]
         [DataType(DataType.Date)]
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime Date { get; set; }
 
         [Range(0, 20)]    
