@@ -38,7 +38,7 @@
         @foreach (var entry in Model)
         {
             <tr>
-                <td>@entry.Date.ToShortDateString()</td>
+                <td>@entry.Date.ToString("dd/MM/yyyy")</td>
                 <td>@entry.WaterIntakeInLiters</td>
                 <td>@entry.Steps</td>
                 <td>@entry.SleepHours</td>
