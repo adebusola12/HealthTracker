@@ -59,8 +59,7 @@ namespace Health_Tracker.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // FIX: ensure PostgreSQL receives UTC
-            entry.Date = DateTime.SpecifyKind(entry.Date.Date, DateTimeKind.Utc);
+            entry.Date = entry.Date.Date;
 
             var existingEntry = await _context.WellnessEntries
                 .FirstOrDefaultAsync(e => e.UserId == userId && e.Date.Date == entry.Date.Date);
@@ -75,7 +74,7 @@ namespace Health_Tracker.Controllers
             {
                 entry.UserId = userId;
 
-                _context.Add(entry);
+                _context.WellnessEntries.Add(entry);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Entry saved successfully!";
@@ -129,7 +128,7 @@ namespace Health_Tracker.Controllers
                 try
                 {
                     // Update fields but keep the original UserId
-                    existingEntry.Date = DateTime.SpecifyKind(entry.Date, DateTimeKind.Utc);
+                    existingEntry.Date = entry.Date.Date;
                     existingEntry.Mood = entry.Mood;
                     existingEntry.SleepHours = entry.SleepHours;
                     existingEntry.WaterIntakeInLiters = entry.WaterIntakeInLiters;
