@@ -31,16 +31,26 @@ builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 
-// Apply migrations automatically
+
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    if (db.Database.GetPendingMigrations().Any())
-    { db.Database.Migrate(); }
+    try
+    {
+        if (db.Database.GetPendingMigrations().Any())
+        {
+            db.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Migration error: " + ex.Message);
+    }
 }
 
-    if (!app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
