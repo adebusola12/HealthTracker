@@ -1,0 +1,69 @@
+﻿@model HealthTracker.ViewModels.WeeklySummaryViewModel
+@{
+    ViewData["Title"] = "Weekly Summary";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 Your Weekly Wellness Summary</h2>
+    <form asp-action="SendWeeklySummaryEmail" asp-controller="Wellness" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-success">
+            📧 Send to My Email
+        </button>
+    </form>
+</div>
+
+<p class="text-muted">
+    Week of @Model.WeekStart.ToString("dd MMM") — @Model.WeekEnd.ToString("dd MMM yyyy")
+    · @Model.TotalEntries entries logged
+</p>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center shadow-sm p-3">
+            <div style="font-size: 2rem;">😴</div>
+            <h6 class="mt-2 text-muted">Avg Sleep</h6>
+            <h3 class="fw-bold">@Model.AvgSleep <small class="fs-6">hrs</small></h3>
+            <small class="text-muted">Goal: 7-9 hrs</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center shadow-sm p-3">
+            <div style="font-size: 2rem;">💧</div>
+            <h6 class="mt-2 text-muted">Avg Water</h6>
+            <h3 class="fw-bold">@Model.AvgWater <small class="fs-6">L</small></h3>
+            <small class="text-muted">Goal: 2-3L</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center shadow-sm p-3">
+            <div style="font-size: 2rem;">👟</div>
+            <h6 class="mt-2 text-muted">Avg Steps</h6>
+            <h3 class="fw-bold">@Model.AvgSteps.ToString("N0")</h3>
+            <small class="text-muted">Goal: 10,000</small>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center shadow-sm p-3">
+            <div style="font-size: 2rem;">😊</div>
+            <h6 class="mt-2 text-muted">Common Mood</h6>
+            <h3 class="fw-bold">@Model.MostCommonMood</h3>
+            <small class="text-muted">Goal: Great/Good</small>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations -->
+<div class="card shadow-sm p-4">
+    <h4 class="mb-3">📌 Recommendations</h4>
+    <p>@Model.SleepRecommendation</p>
+    <p>@Model.WaterRecommendation</p>
+    <p>@Model.StepsRecommendation</p>
+    <p>@Model.MoodRecommendation</p>
+</div>

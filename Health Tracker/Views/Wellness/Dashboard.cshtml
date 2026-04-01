@@ -1,0 +1,193 @@
+﻿@model HealthTracker.ViewModels.DashboardViewModel
+@using System.Text.Json
+@inject IJsonHelper Json
+
+@{
+    ViewData["Title"] = "Wellness Dashboard";
+}
+
+@if (ViewBag.Streak > 0)
+{
+    <div class="alert alert-success text-center">
+        🔥 You're on a <strong>@ViewBag.Streak day streak!</strong> Keep it going!
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        Start your wellness streak today 💪
+    </div>
+}
+
+<h2 class="mb-4">Wellness Dashboard</h2>
+
+@if (!Model.Entries.Any())
+{
+    <div class="alert alert-info">
+        No wellness data yet. Start tracking to see your dashboard!
+    </div>
+}
+else
+{
+    <!-- ================= KPI CARDS ================= -->
+    <div class="row mb-4">
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Entries</small>
+                <h4>@Model.TotalEntries</h4>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Avg Sleep</small>
+                <h4>@Model.AvgSleep.ToString("0.0")h</h4>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Avg Steps</small>
+                <h4>@Model.AvgSteps.ToString("0")</h4>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Avg Water</small>
+                <h4>@Model.AvgWater.ToString("0.0")L</h4>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Avg BMI</small>
+                <h4>@Model.AvgBMI.ToString("0.0")</h4>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Wellness Score</small>
+                <h4>@Model.WellnessScore / 100</h4>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= CHARTS SECTION ================= -->
+    <div class="row">
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h6 class="text-center">Sleep Trend</h6>
+                <canvas id="sleepChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h6 class="text-center">Steps Per Day</h6>
+                <canvas id="stepsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h6 class="text-center">Water Intake</h6>
+                <canvas id="waterChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h6 class="text-center">BMI Trend</h6>
+                <canvas id="bmiChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h6 class="text-center">Mood Distribution</h6>
+                <canvas id="moodChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= CHART SCRIPT ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const labels = @Html.Raw(Json.Serialize(Model.Entries.Select(e => e.Date.ToString("MM/dd"))));
+
+        const sleepData = @Html.Raw(Json.Serialize(Model.Entries.Select(e => e.SleepHours)));
+        const stepsData = @Html.Raw(Json.Serialize(Model.Entries.Select(e => e.Steps)));
+        const waterData = @Html.Raw(Json.Serialize(Model.Entries.Select(e => e.WaterIntakeInLiters)));
+        const bmiData = @Html.Raw(Json.Serialize(Model.Entries.Select(e => e.BMI)));
+
+        const moodLabels = @Html.Raw(Json.Serialize(Model.MoodDistribution.Keys));
+        const moodValues = @Html.Raw(Json.Serialize(Model.MoodDistribution.Values));
+
+        new Chart(document.getElementById('sleepChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sleep (Hours)',
+                    data: sleepData,
+                    borderWidth: 2,
+                    fill: false
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('stepsChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Steps',
+                    data: stepsData,
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('waterChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Water (Liters)',
+                    data: waterData,
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('bmiChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'BMI',
+                    data: bmiData,
+                    borderWidth: 2,
+                    fill: false
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('moodChart'), {
+            type: 'doughnut',
+            data: {
+                labels: moodLabels,
+                datasets: [{
+                    data: moodValues
+                }]
+            }
+        });
+    </script>
+}

@@ -1,0 +1,267 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using HealthTracker.Models
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthyMe</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Health_Tracker.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background-color: #1a1a2e;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+            .sidebar .brand {
+                color: #4CAF50;
+                font-size: 1.3rem;
+                font-weight: 700;
+                padding: 10px 20px 15px 20px;
+                text-decoration: none;
+            }
+
+            .sidebar .nav-link {
+                color: #ccc;
+                padding: 8px 20px;
+                display: block;
+                text-decoration: none;
+                transition: all 0.2s;
+                border-left: 3px solid transparent;
+                font-size: 0.9rem;
+            }
+
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active {
+                    color: #fff;
+                    background-color: rgba(255,255,255,0.05);
+                    border-left: 3px solid #4CAF50;
+                }
+
+                .sidebar .nav-link span {
+                    margin-right: 8px;
+                }
+
+        .sidebar-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 5px 20px;
+        }
+
+        .sidebar .user-info {
+            padding: 8px 20px;
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+
+            .sidebar .user-info strong {
+                color: #fff;
+                display: block;
+                font-size: 0.85rem;
+            }
+
+        .sidebar .logout-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            padding: 8px 20px;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+            .sidebar .logout-btn:hover {
+                color: #fff;
+                background-color: rgba(255,255,255,0.05);
+                border-left: 3px solid #e74c3c;
+            }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        footer {
+            margin-left: 240px;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                overflow-y: visible;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            footer {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loadingSpinner" style="
+        position: fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:white;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a class="brand" asp-controller="Home" asp-action="Index">🌿 HealthyMe</a>
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <div class="sidebar-divider"></div>
+
+            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                <span>🏠</span> Home
+            </a>
+            <a class="nav-link" asp-controller="Wellness" asp-action="Index">
+                <span>📋</span> My Entries
+            </a>
+            <a class="nav-link" asp-controller="Wellness" asp-action="Create">
+                <span>➕</span> Add Entry
+            </a>
+            <a class="nav-link" asp-controller="Wellness" asp-action="Dashboard">
+                <span>📊</span> Dashboard
+            </a>
+            <a class="nav-link" asp-controller="Wellness" asp-action="SendWeeklySummary">
+                <span>📧</span> Weekly Summary
+            </a>
+            <a class="nav-link" asp-controller="Home" asp-action="Privacy">
+                <span>🔒</span> Privacy
+            </a>
+        }
+
+        <div class="sidebar-divider"></div>
+
+        @{
+            var currentUser = User.Identity?.IsAuthenticated == true
+            ? await UserManager.GetUserAsync(User)
+            : null;
+        }
+
+        @if (currentUser != null)
+        {
+            <div class="user-info">
+                @if (!string.IsNullOrEmpty(currentUser.ProfilePhotoPath))
+                {
+                    <img src="@currentUser.ProfilePhotoPath"
+                         width="35"
+                         height="35"
+                         class="rounded-circle mb-2"
+                         style="object-fit:cover;" />
+                }
+                <strong>@currentUser.FirstName @currentUser.LastName</strong>
+                <span style="font-size: 0.75rem; word-break: break-all; display: block;">@currentUser.Email</span>
+            </div>
+
+            <a class="nav-link" asp-controller="Home" asp-action="Profile">
+                <span>👤</span> My Profile
+            </a>
+
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="logout-btn">
+                    <span>🚪</span> Logout
+                </button>
+            </form>
+        }
+        else
+        {
+            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                <span>📝</span> Register
+            </a>
+            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                <span>🔑</span> Login
+            </a>
+        }
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+    <footer class="border-top text-muted bg-light">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>HealthyMe</h6>
+                    <p class="small">
+                        Track your wellness journey, monitor habits, and gain meaningful health insights.
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled small">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="Wellness" asp-action="Dashboard">Dashboard</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Account</h6>
+                    <ul class="list-unstyled small">
+                        <li><a asp-controller="Account" asp-action="Login">Login</a></li>
+                        <li><a asp-controller="Account" asp-action="Register">Register</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center small">
+                &copy; @DateTime.Now.Year HealthyMe. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        window.addEventListener("load", function () {
+            document.getElementById("loadingSpinner").style.display = "none";
+        });
+    </script>
+</body>
+</html>
